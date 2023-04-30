@@ -15,6 +15,8 @@
         "inlineSources": true,
   
         "outDir": "_compile",
+
+        "lib": ["es2020"]
     },
     "include": [
         "src/**/*",

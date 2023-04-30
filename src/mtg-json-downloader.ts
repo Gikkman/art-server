@@ -1,11 +1,10 @@
 import { createWriteStream, mkdirSync, mkdtempSync, PathLike } from "fs";
-import { mkdtemp, readFile, unlink } from "fs/promises";
+import { readFile, unlink, rmdir } from "fs/promises";
 import { dirname, join } from "path";
 import { createHash } from 'crypto';
 import { promisify } from 'util';
 import axios from "axios";
 import stream from "stream";
-import { tmpdir } from "os";
 import decompress from "decompress";
 
 const finished = promisify(stream.finished);
@@ -63,7 +62,8 @@ fetchFile(downloadDir)
         await ensureDir(unzipDir)
         const unzipLocation = "AllPrintings-"+Math.floor(new Date().getTime() / 1000)+".sqlite"
         await unzip(file, unzipDir, unzipLocation)
-        unlink(file)
+        await unlink(file)
+        await rmdir(downloadDir)
         console.log(unzipLocation)
     })
     .catch(ex => {
