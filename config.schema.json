@@ -1,0 +1,91 @@
+{
+  "$ref": "#/definitions/ProgramConfig",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "ProgramConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "storage": {
+          "additionalProperties": false,
+          "properties": {
+            "fileSystem": {
+              "additionalProperties": false,
+              "properties": {
+                "acceptedPath": {
+                  "type": "string"
+                },
+                "pendingPath": {
+                  "type": "string"
+                },
+                "storageClass": {
+                  "const": "FileSystem",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "storageClass",
+                "acceptedPath",
+                "pendingPath"
+              ],
+              "type": "object"
+            },
+            "googleDrive": {
+              "additionalProperties": false,
+              "properties": {
+                "googleKey": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "googleKey"
+              ],
+              "type": "object"
+            },
+            "s3": {
+              "additionalProperties": false,
+              "properties": {
+                "acceptedPrefix": {
+                  "type": "string"
+                },
+                "accessKey": {
+                  "type": "string"
+                },
+                "bucketName": {
+                  "type": "string"
+                },
+                "endpointUrl": {
+                  "type": "string"
+                },
+                "pendingPrefix": {
+                  "type": "string"
+                },
+                "secretKey": {
+                  "type": "string"
+                },
+                "storageClass": {
+                  "const": "S3",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "storageClass",
+                "bucketName",
+                "endpointUrl",
+                "accessKey",
+                "secretKey",
+                "acceptedPrefix",
+                "pendingPrefix"
+              ],
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "storage"
+      ],
+      "type": "object"
+    }
+  }
+}

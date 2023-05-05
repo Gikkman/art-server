@@ -1,0 +1,9 @@
+{
+  "storage": {
+    "fileSystem": {
+      "storageClass": "FileSystem",
+      "acceptedPath": "./uploads/accepted",
+      "pendingPath": "./uploads/pending"
+    }
+  }
+}
