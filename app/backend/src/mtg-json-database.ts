@@ -1,12 +1,14 @@
-import { Card } from "./types/CardTypes";
+import { Card } from "./../../types/CardTypes";
 import Database from "better-sqlite3";
 import path from "path";
 import { readdir } from "fs/promises";
+import { WORK_DIR } from "./const";
 
 async function getDb() {
-  const file = (await readdir("_data")).sort().find((e) => e.endsWith(".sqlite"));
+  const _data = path.join(WORK_DIR, "_data");
+  const file = (await readdir(_data)).sort().find((e) => e.endsWith(".sqlite"));
   if (!file) throw "No sqlite file found in _data folder";
-  const location = path.join(".", "_data", file);
+  const location = path.join(_data, file);
   return new Database(location, { readonly: true });
 }
 

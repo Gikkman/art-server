@@ -27,5 +27,5 @@ module.exports = {
     node: true,
   },
 
-  ignorePatterns: ["node_modules/**/*", "_compile/**/*.js", "src/**/*.guard.ts"],
+  ignorePatterns: ["node_modules/**/*", "_compile/**/*.js", "app/**/*.guard.ts"],
 };

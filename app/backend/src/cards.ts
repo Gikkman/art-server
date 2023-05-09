@@ -1,5 +1,5 @@
-import fetch from "node-fetch";
-import { isScryfallCard } from "./types/CardTypes.guard";
+import axios from "axios";
+import { isScryfallCard } from "../../types/CardTypes.guard";
 import {
   Card,
   CardImage,
@@ -7,15 +7,15 @@ import {
   SingleFaceCard,
   isSingleFaced,
   isTwoFaced,
-} from "./types/CardTypes";
+} from "../../types/CardTypes";
 
 export async function getCardImages(cards: Card[]) {
   const responses: CardImage[] = [];
 
   for (const card of cards) {
     const url = `https://api.scryfall.com/cards/${card.scryfallId}/?format=json&include_extras=true&include_multilingual=true&pretty=true`;
-    const response = await fetch(url);
-    const data = await response.json();
+    const response = await axios.get(url);
+    const data = response.data;
     if (!isScryfallCard(data)) {
       throw "Scryfall response was not compatible with type ScryfallCard";
     }

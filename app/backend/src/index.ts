@@ -5,6 +5,8 @@ import {
   getCardDataBySetAndNumber,
 } from "./mtg-json-database";
 import { getCardImages } from "./cards";
+import path from "path";
+import { WORK_DIR } from "./const";
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -36,6 +38,8 @@ app.get("/", async (req, res) => {
 
   res.status(400).send("Bad set of params. Require [set, name] or [set, nr] or [name]");
 });
+
+app.use("/ui", express.static(path.join(WORK_DIR, "public"), { index: "index.html" }));
 
 app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);

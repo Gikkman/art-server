@@ -105,3 +105,5 @@ dist
 
 _data/
 _compile/
+.rollup.cache/
+**/build/
