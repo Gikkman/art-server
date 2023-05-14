@@ -2,16 +2,19 @@
   "name": "art-server",
   "description": "",
   "version": "1.0.0",
-  "main": "_compile/index.js",
+  "main": "app/backend/_dist/backend/src/index.js",
+  "private": true,
   "workspaces": [
     "./app/backend",
     "./app/frontend"
   ],
   "scripts": {
-    "download": "ts-node scripts/mtg-json-downloader.ts",
     "prebuild": "npx ts-json-schema-generator --path 'app/types/ProgramConfig.ts' --type 'ProgramConfig' --out './config.schema.json' --tsconfig './tsconfig.json'",
-    "build": "rm -rf _compile && npm run --prefix ./app/backend build && npm run --prefix ./app/frontend build",
-    "start": "node ./_compile/app/backend/src/index.js",
+    "build": "concurrently \"npm:build-types\" \"npm:build-backend\" \"npm:build-frontend\"",
+    "build-types": "npm run --prefix ./app/types build",
+    "build-backend": "npm run --prefix ./app/backend build",
+    "build-frontend": "npm run --prefix ./app/frontend build",
+    "start": "npm run --prefix ./app/backend start",
     "watch": "concurrently \"npm:watch-backend\" \"npm:watch-frontend\"",
     "watch-backend": "npm run --prefix ./app/backend watch",
     "watch-frontend": "npm run --prefix ./app/frontend watch"

@@ -1,6 +1,7 @@
-export interface Card {
+export type CardImage = {
   name: string;
+  illustrationId: string;
   imageUrl: string;
-  artist: string;
-  releaseDate: string;
-}
+  available?: boolean;
+  hasOtherFace?: boolean;
+};

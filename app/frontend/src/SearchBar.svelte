@@ -1,40 +1,70 @@
 <script lang="ts">
-  // Import the necessary dependencies
-  import { onMount } from "svelte";
-  import { searchCards } from "./api";
-  import type { Card } from "./types";
+  import AutoComplete from "simple-svelte-autocomplete"
+  import {type CardImage} from "../../types/CardTypes"
 
   // Communications channel
-  export let cards: Card[];
+  export let cards: CardImage[];
+   
+  let previousSearchWordLower: string = "";
+  let previousSearchResult: {name:string}[] = [];
 
-  let searchQuery = "";
+  async function query(keyword: string) {
+    if(!keyword) return [];
 
-  // Function to update the cards based on the search query
-  async function updateCards() {
-    if (!searchQuery) return;
-    cards = await searchCards(searchQuery);
-    console.log(cards);
+    // Local search cached results if the user just types more
+    const keywordLower = keyword.toLowerCase();
+    if(previousSearchResult.length > 0 && keywordLower.startsWith(previousSearchWordLower)) {
+      const newResult: {name:string}[] = [];
+      for(let i = 0; i < previousSearchResult.length; i++) {
+        const word = previousSearchResult[i].name.toLowerCase();
+        if(word.startsWith(keywordLower)) {
+          newResult.push(previousSearchResult[i])
+        }
+      }
+      previousSearchResult = newResult;
+      return newResult;
+    }
+
+    // Fetch from the server if it is a new search
+    const controller = new AbortController();
+    setTimeout(() => {
+      controller.abort();
+    }, 5_000);
+    try {
+      const response = await fetch(`/query?name=${keyword}`, {signal: controller.signal})
+      if(response.status >= 200 && response.status < 300) {
+        const data = await response.json();
+        previousSearchResult = data.names;
+        previousSearchWordLower = keywordLower;
+        return data.names;
+      }
+    } catch (ex) {
+      console.error(ex)
+    }
+
+    return [];
   }
 
-  // Function to handle when the search query changes
-  function handleSearchQueryChange(event: Event) {
-    searchQuery = (event.target as HTMLInputElement).value;
-    updateCards();
+  async function onChange(item: {name: string}) {
+    if(!item || !item.name) return;
+    const response = await fetch(`/search?name=${item.name}`)
+    if(response.status >= 200 && response.status < 300) {
+      const data = await response.json();
+      console.log(data);
+      return cards = data;
+    }
   }
 
-  // On mount, fetch the initial list of cards
-  onMount(updateCards);
 </script>
 
 <!-- Search input field -->
-<input
-  type="text"
-  placeholder="Search for a Magic the Gathering card"
-  on:change={handleSearchQueryChange}
+<AutoComplete
+  searchFunction={query}
+  delay="200"
+  localSorting={true}
+  minCharactersToSearch=3
+  maxItemsToShowInList=20
+  labelFieldName="name"
+  valueFieldName="name"
+  onChange={onChange}
 />
-
-<style>
-  input {
-    width: 90%;
-  }
-</style>

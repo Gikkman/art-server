@@ -1,13 +1,13 @@
 <script lang="ts">
-  import type { Card } from "./types";
+  import {type CardImage} from "../../types/CardTypes"
   import CardGrid from "./CardGrid.svelte";
   import SearchBar from "./SearchBar.svelte";
 
-  let cards: Card[] = [];
-  let selectedCard: Card | null = null;
+  let cards: CardImage[] = [];
+  let selectedCard: CardImage | null = null;
   let cardDetailsVisible = false;
 
-  async function onCardClick(card: Card): Promise<void> {
+  async function onCardClick(card: CardImage): Promise<void> {
     selectedCard = card;
     cardDetailsVisible = true;
 

@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "build": "npx ts-auto-guard --export-all ./**/*.ts"
+  },
+  "devDependencies": {
+    "ts-json-schema-generator": "^1.2.0",
+    "typescript": "^5.0.4"
+  }
+}

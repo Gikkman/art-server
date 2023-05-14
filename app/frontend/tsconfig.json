@@ -1,16 +1,15 @@
 {
-  "extends": [
-    "../../tsconfig.json",
-    "@tsconfig/svelte/tsconfig.json"
-  ],
+  "extends": "@tsconfig/svelte/tsconfig.json",
   "compilerOptions": {
     "module": "ESNext",
     "lib": [
       "dom"
     ],
+    "rootDir": ".."
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "../types/CardTypes.ts"
   ],
   "exclude": [
     "node_modules/*",

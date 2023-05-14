@@ -104,6 +104,6 @@ dist
 .tern-port
 
 _data/
-_compile/
+_dist/
 .rollup.cache/
 **/build/

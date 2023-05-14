@@ -2,7 +2,7 @@
  * Generated type guards for "CardTypes.ts".
  * WARNING: Do not manually change this file.
  */
-import { Card, ScryfallCard, ScryfallImageUris, SingleFaceCard, MultiFaceCard, CardFace, CardImage } from "./CardTypes";
+import { Card, ScryfallCard, ScryfallImageUris, SingleFaceCard, MultiFaceCard, CardFace, CardImage, ArtState } from "./CardTypes";
 
 export function isCard(obj: unknown): obj is Card {
     const typedObj = obj as Card
@@ -11,10 +11,20 @@ export function isCard(obj: unknown): obj is Card {
             typeof typedObj === "object" ||
             typeof typedObj === "function") &&
         typeof typedObj["name"] === "string" &&
-        typeof typedObj["collectorNumber"] === "string" &&
         typeof typedObj["setCode"] === "string" &&
+        typeof typedObj["collectorNumber"] === "string" &&
         typeof typedObj["scryfallId"] === "string" &&
-        typeof typedObj["scryfallIllustrationId"] === "string"
+        typeof typedObj["scryfallIllustrationId"] === "string" &&
+        (typeof typedObj["faceName"] === "undefined" ||
+            typeof typedObj["faceName"] === "string") &&
+        (typeof typedObj["layout"] === "undefined" ||
+            typeof typedObj["layout"] === "string") &&
+        (typeof typedObj["side"] === "undefined" ||
+            typedObj["side"] === "a" ||
+            typedObj["side"] === "b") &&
+        typeof typedObj["uuid"] === "string" &&
+        (typeof typedObj["otherFaceIds"] === "undefined" ||
+            typeof typedObj["otherFaceIds"] === "string")
     )
 }
 
@@ -25,6 +35,7 @@ export function isScryfallCard(obj: unknown): obj is ScryfallCard {
             typeof typedObj === "object" ||
             typeof typedObj === "function") &&
         typeof typedObj["name"] === "string" &&
+        typeof typedObj["id"] === "string" &&
         (typeof typedObj["illustration_id"] === "undefined" ||
             typeof typedObj["illustration_id"] === "string") &&
         (typeof typedObj["image_uris"] === "undefined" ||
@@ -66,6 +77,7 @@ export function isSingleFaceCard(obj: unknown): obj is SingleFaceCard {
             typeof typedObj === "object" ||
             typeof typedObj === "function") &&
         typeof typedObj["name"] === "string" &&
+        typeof typedObj["id"] === "string" &&
         typeof typedObj["layout"] === "string" &&
         typeof typedObj["illustration_id"] === "string" &&
         isScryfallImageUris(typedObj["image_uris"]) as boolean
@@ -79,6 +91,7 @@ export function isMultiFaceCard(obj: unknown): obj is MultiFaceCard {
             typeof typedObj === "object" ||
             typeof typedObj === "function") &&
         typeof typedObj["name"] === "string" &&
+        typeof typedObj["id"] === "string" &&
         (typedObj["layout"] === "split" ||
             typedObj["layout"] === "flip" ||
             typedObj["layout"] === "transform" ||
@@ -116,6 +129,18 @@ export function isCardImage(obj: unknown): obj is CardImage {
             typeof typedObj === "function") &&
         typeof typedObj["name"] === "string" &&
         typeof typedObj["illustrationId"] === "string" &&
-        typeof typedObj["imageUrl"] === "string"
+        typeof typedObj["imageUrl"] === "string" &&
+        (typeof typedObj["available"] === "undefined" ||
+            typedObj["available"] === false ||
+            typedObj["available"] === true)
+    )
+}
+
+export function isArtState(obj: unknown): obj is ArtState {
+    const typedObj = obj as ArtState
+    return (
+        (typedObj === "UNAVAILABLE" ||
+            typedObj === "PENDING" ||
+            typedObj === "AVAILABLE")
     )
 }

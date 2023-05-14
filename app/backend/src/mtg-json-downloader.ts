@@ -1,11 +1,13 @@
-import { PathLike, createWriteStream, mkdirSync, mkdtempSync } from "fs";
+import { PathLike, createWriteStream, mkdirSync, mkdtempSync, readdirSync } from "fs";
 import { readFile, rmdir, unlink } from "fs/promises";
-import { dirname, join } from "path";
+import { join, sep } from "path";
 import { createHash } from "crypto";
 import { promisify } from "util";
 import axios from "axios";
 import stream from "stream";
 import decompress from "decompress";
+import Database from "better-sqlite3";
+import { mtgJsonDir } from "./mtg-json-database";
 
 const finished = promisify(stream.finished);
 
@@ -50,25 +52,57 @@ async function getHashFromServer() {
 }
 
 async function ensureDir(dir: string) {
-  const dirName = dirname(dir);
-  mkdirSync(dirName, { recursive: true });
+  mkdirSync(dir, { recursive: true });
 }
 
-const downloadDir = process.env.DOWNLOAD_DIR || mkdtempSync("mtg-json-");
-const unzipDir = process.env.DATA_DIR || "./_data";
-fetchFile(downloadDir)
-  .then(async (file) => {
-    const localFileHash = await hashFile(file);
-    const remoteHash = await getHashFromServer();
-    if (localFileHash !== remoteHash)
-      throw `Error: Hash missmatch! Remote: ${remoteHash} Local: ${localFileHash}`;
-    await ensureDir(unzipDir);
-    const unzipLocation = "AllPrintings-" + Math.floor(new Date().getTime() / 1000) + ".sqlite";
-    await unzip(file, unzipDir, unzipLocation);
-    await unlink(file);
-    await rmdir(downloadDir);
-    console.log(unzipLocation);
-  })
-  .catch((ex) => {
-    console.error(ex);
-  });
+export async function runDownload() {
+  const dataDir = mtgJsonDir();
+  ensureDir(dataDir);
+  const downloadDir = join(dataDir) + sep + mkdtempSync("dl-");
+  ensureDir(downloadDir);
+
+  await fetchFile(downloadDir)
+    .then(async (file) => {
+      const localFileHash = await hashFile(file);
+      const remoteHash = await getHashFromServer();
+      if (localFileHash !== remoteHash) {
+        throw `Error: Hash mismatch! Remote: ${remoteHash} Local: ${localFileHash}`;
+      }
+      return file;
+    })
+    .then(async (file) => {
+      const unzipLocation = "AllPrintings-" + Math.floor(new Date().getTime() / 1000) + ".sqlite";
+      await unzip(file, dataDir, unzipLocation);
+      await unlink(file);
+      await rmdir(downloadDir);
+      console.log("Unpacked to: " + unzipLocation);
+      const dbPath = join(dataDir, unzipLocation);
+      return dbPath;
+    })
+    .then(async (dbPath) => {
+      console.log("Creating indexes for db " + dbPath);
+      const db = new Database(dbPath, {});
+      db.prepare("CREATE INDEX IF NOT EXISTS idx_cards_name ON cards(name COLLATE NOCASE)").run();
+      db.prepare("CREATE INDEX IF NOT EXISTS idx_cards_number ON cards(number COLLATE NOCASE)").run();
+      db.prepare("CREATE INDEX IF NOT EXISTS idx_cards_set ON cards(setCode COLLATE NOCASE)").run();
+      db.prepare("CREATE INDEX IF NOT EXISTS idx_cards_face ON cards(faceName COLLATE NOCASE)").run();
+      db.close();
+    })
+    .catch((ex) => {
+      console.error(ex);
+    });
+}
+
+export async function downloadIfNotPresent() {
+  const dataDir = mtgJsonDir();
+  ensureDir(dataDir);
+
+  const dbExists = readdirSync(dataDir).filter((e) => e.endsWith(".sqlite")).length > 0;
+  if (dbExists) {
+    console.log("An mtg-json file was already downloaded. Skipping download on startup.");
+    return;
+  }
+
+  console.log("No mtg-json file was found. Download before startup.");
+  return await runDownload();
+}

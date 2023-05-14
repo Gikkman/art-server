@@ -8,9 +8,10 @@
         "type": "node",
         "request": "launch",
         "name": "Launch Program",
-        "program": "${workspaceFolder}/src/index.ts",
-        "preLaunchTask": "npm: compile",
-        "outFiles": ["${workspaceFolder}/_compile/**/*.js"]
+        "cwd": "${workspaceFolder}/app/backend",
+        "program": "${workspaceFolder}/app/backend/_dist/backend/src/index.js",
+        "preLaunchTask": "npm: build",
+        "outFiles": ["${workspaceFolder}/app/backend/_dist/backend/src/**/*.js"]
       }
     ]
   }

@@ -1,13 +1,19 @@
 export type Card = {
   name: string;
-  collectorNumber: string;
   setCode: string;
+  collectorNumber: string;
   scryfallId: string;
   scryfallIllustrationId: string;
+  faceName?: string;
+  layout?: string;
+  side?: "a" | "b" | undefined;
+  uuid: string;
+  otherFaceIds?: string;
 };
 
 export type ScryfallCard = {
   name: string;
+  id: string;
   illustration_id?: string;
   image_uris?: {
     normal: string;
@@ -30,6 +36,7 @@ export type ScryfallImageUris = {
 
 export type SingleFaceCard = {
   name: string;
+  id: string;
   layout: string;
   illustration_id: string;
   image_uris: ScryfallImageUris;
@@ -37,6 +44,7 @@ export type SingleFaceCard = {
 
 export type MultiFaceCard = {
   name: string;
+  id: string;
   layout: TwoFacedLayout;
   image_uris?: ScryfallImageUris;
   card_faces: [CardFace, CardFace];
@@ -52,7 +60,24 @@ export type CardImage = {
   name: string;
   illustrationId: string;
   imageUrl: string;
+  available?: boolean;
+  hasOtherFace?: boolean;
 };
+
+export const ART_STATE = ["UNAVAILABLE", "PENDING", "AVAILABLE"] as const;
+export const ART_STATE_MAPPING = {
+  UNAVAILABLE: 10,
+  PENDING: 20,
+  AVAILABLE: 30,
+} as const satisfies Record<ArtState, number>;
+export type ArtState = (typeof ART_STATE)[number];
+export function toArtState(s?: string): ArtState {
+  if (!s) return "UNAVAILABLE";
+  if (ART_STATE.includes(s as ArtState)) {
+    return s as ArtState;
+  }
+  return "UNAVAILABLE";
+}
 
 export const TWO_FACED_LAYOUT = [
   "split",
@@ -63,8 +88,7 @@ export const TWO_FACED_LAYOUT = [
   "battle",
   "double_faced_token",
 ] as const;
-type TwoFacedLayoutTuple = typeof TWO_FACED_LAYOUT;
-type TwoFacedLayout = TwoFacedLayoutTuple[number];
+type TwoFacedLayout = (typeof TWO_FACED_LAYOUT)[number];
 
 export function isTwoFaced(card: ScryfallCard): card is MultiFaceCard {
   return (
