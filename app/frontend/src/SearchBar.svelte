@@ -66,5 +66,6 @@
   maxItemsToShowInList=20
   labelFieldName="name"
   valueFieldName="name"
+  placeholder="Search an MtG card name"
   onChange={onChange}
 />
