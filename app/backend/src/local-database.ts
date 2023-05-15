@@ -37,14 +37,13 @@ export function isArtAvailable(...scryfallIllustrationIds: string[]): Map<string
     FROM art a 
     JOIN art_state s 
         ON a.state_id = s.id  
-    WHERE a.scryfallIllustrationId=?
+    WHERE a.scryfallIllustrationId IN (${scryfallIllustrationIds.map(() => "?").join(",")})
   `;
-  const stmt = db.prepare(query);
+  const rows = db.prepare(query).all(scryfallIllustrationIds) as ArtStateRow[];
   const map: Map<string, ArtState> = new Map();
-  for (const id of scryfallIllustrationIds) {
-    const row = stmt.get(id) as ArtStateRow;
+  for (const row of rows) {
     if (row && typeof row === "object" && "state" in row && "scryfallIllustrationId" in row) {
-      map.set(id, toArtState(row.state));
+      map.set(row.scryfallIllustrationId, toArtState(row.state));
     }
   }
   db.close();

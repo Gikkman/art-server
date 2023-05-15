@@ -18,7 +18,7 @@ async function getDb() {
     .find((e) => e.endsWith(".sqlite"));
   if (!file) throw "No sqlite file found in _data folder";
   const location = path.join(dir, file);
-  return new Database(location, { readonly: true });
+  return new Database(location);
 }
 
 const BASE_QUERY = `
@@ -119,6 +119,7 @@ async function queryOtherFace(uuid: string) {
 }
 
 async function processCards(cards: Card[]) {
+  const s = Date.now();
   type Copy = Card & { otherFace?: Card };
   const uuidMap: Map<string, Card> = new Map();
   const map: Map<string, Copy> = new Map();
@@ -165,6 +166,7 @@ async function processCards(cards: Card[]) {
     const artState = artAvailability.get(r.illustrationId);
     r.available = artState === "AVAILABLE";
   }
+  console.log("Process time: " + (Date.now() - s));
   return ret;
 }
 
