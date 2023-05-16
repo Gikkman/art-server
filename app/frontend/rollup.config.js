@@ -38,7 +38,7 @@ export default {
     }),
 
     copy({
-      targets: production ? [{ src: "public/**", dest }] : [],
+      targets: [{ src: "public/**", dest }]
     }),
 
     // If you have external dependencies installed from

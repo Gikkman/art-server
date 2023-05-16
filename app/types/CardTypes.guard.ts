@@ -132,7 +132,10 @@ export function isCardImage(obj: unknown): obj is CardImage {
         typeof typedObj["imageUrl"] === "string" &&
         (typeof typedObj["available"] === "undefined" ||
             typedObj["available"] === false ||
-            typedObj["available"] === true)
+            typedObj["available"] === true) &&
+        (typeof typedObj["hasOtherFace"] === "undefined" ||
+            typedObj["hasOtherFace"] === false ||
+            typedObj["hasOtherFace"] === true)
     )
 }
 
