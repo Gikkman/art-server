@@ -7,6 +7,7 @@
    
   let previousSearchWordLower: string = "";
   let previousSearchResult: {name:string}[] = [];
+  let previousChosenCard: {name:string} = {name:""};
 
   async function query(keyword: string) {
     if(!keyword) return [];
@@ -21,6 +22,7 @@
           newResult.push(previousSearchResult[i])
         }
       }
+      previousSearchWordLower = keywordLower;
       previousSearchResult = newResult;
       return newResult;
     }
@@ -46,11 +48,12 @@
   }
 
   async function onChange(item: {name: string}) {
-    if(!item || !item.name) return;
+    if(!item || !item.name || item.name === previousChosenCard.name) return;
+    previousChosenCard = item;
+    previousSearchWordLower = item.name.toLowerCase();
     const response = await fetch(`/search?name=${item.name}`)
     if(response.status >= 200 && response.status < 300) {
       const data = await response.json();
-      console.log(data);
       return cards = data;
     }
   }
