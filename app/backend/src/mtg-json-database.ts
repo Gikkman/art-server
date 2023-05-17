@@ -45,12 +45,19 @@ ORDER BY releaseDate
 `;
 
 export async function query(name: string): Promise<string[]> {
-  //Replace spaces with %. If there's several repeating spaces, they become just one %
-  const key = "%" + name.split(/\s+/).join("%") + "%";
+  const key = "%" + name + "%";
   const db = await getDb();
   const query = `SELECT name FROM cards WHERE name LIKE ? GROUP BY name`;
   const rows = db.prepare(query).all(key) as string[];
-  return rows;
+  if (rows.length > 0) {
+    db.close();
+    return rows;
+  }
+
+  const newKey = "%" + name.split(" ").join(" // ") + "%";
+  const newRows = db.prepare(query).all(newKey) as string[];
+  db.close();
+  return newRows;
 }
 
 export async function getCardDataByName(cardName: string): Promise<CardImage[]> {

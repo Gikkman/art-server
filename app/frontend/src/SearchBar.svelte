@@ -1,7 +1,7 @@
 <script lang="ts">
   import AutoComplete from "simple-svelte-autocomplete"
   import {type CardImage} from "../../types/CardTypes"
-  import { localQueryFilter, remoteQuery, type QueryResult } from "./search-api";
+  import { localQueryFilter, remoteQuery, type QueryResult, apiCardSearch } from "./search-api";
 
   // Communications channel
   export let cards: CardImage[];
@@ -33,27 +33,26 @@
     if(!item || !item.name || item.name === previousChosenCard.name) return;
     previousChosenCard = item;
     previousQueryKeyword = item.name.toLowerCase();
-    const response = await fetch(`/search?name=${item.name}`)
-    if(response.status >= 200 && response.status < 300) {
-      const data = await response.json();
-      return cards = data;
-    }
+    cards = await apiCardSearch(item);
+    return cards;
   }
 
 </script>
 
 <AutoComplete
+  delay="250"
   searchFunction={query}
 
-  delay="250"
   localSorting={true}
   localFiltering={false}
   cleanUserText={false}
+
   minCharactersToSearch=3
   maxItemsToShowInList=14
+  
   labelFieldName="name"
   valueFieldName="name"
   placeholder="Search an MtG card name"
-
+  
   onChange={onChange}
 />
