@@ -5,25 +5,26 @@
   // Communications channel
   export let cards: CardImage[];
    
-  let previousSearchWordLower: string = "";
-  let previousSearchResult: {name:string}[] = [];
+  let previousQueryKeyword: string = "";
+  let previousQueryResult: {name:string}[] = [];
   let previousChosenCard: {name:string} = {name:""};
 
   async function query(keyword: string) {
+    console.log(keyword)
     if(!keyword) return [];
 
     // Local search cached results if the user just types more
-    const keywordLower = keyword.toLowerCase();
-    if(previousSearchResult.length > 0 && keywordLower.startsWith(previousSearchWordLower)) {
+    // Note that "keyword" is cast to lower case by the AutoComplete component
+    if(previousQueryResult.length > 0 && keyword.startsWith(previousQueryKeyword)) {
       const newResult: {name:string}[] = [];
-      for(let i = 0; i < previousSearchResult.length; i++) {
-        const word = previousSearchResult[i].name.toLowerCase();
-        if(word.startsWith(keywordLower)) {
-          newResult.push(previousSearchResult[i])
+      for(let i = 0; i < previousQueryResult.length; i++) {
+        const word = previousQueryResult[i].name.toLowerCase();
+        if(word.startsWith(keyword)) {
+          newResult.push(previousQueryResult[i])
         }
       }
-      previousSearchWordLower = keywordLower;
-      previousSearchResult = newResult;
+      previousQueryKeyword = keyword;
+      previousQueryResult = newResult;
       return newResult;
     }
 
@@ -36,8 +37,8 @@
       const response = await fetch(`/query?name=${keyword}`, {signal: controller.signal})
       if(response.status >= 200 && response.status < 300) {
         const data = await response.json();
-        previousSearchResult = data.names;
-        previousSearchWordLower = keywordLower;
+        previousQueryResult = data.names;
+        previousQueryKeyword = keyword;
         return data.names;
       }
     } catch (ex) {
@@ -50,7 +51,7 @@
   async function onChange(item: {name: string}) {
     if(!item || !item.name || item.name === previousChosenCard.name) return;
     previousChosenCard = item;
-    previousSearchWordLower = item.name.toLowerCase();
+    previousQueryKeyword = item.name.toLowerCase();
     const response = await fetch(`/search?name=${item.name}`)
     if(response.status >= 200 && response.status < 300) {
       const data = await response.json();
@@ -65,10 +66,12 @@
   searchFunction={query}
   delay="200"
   localSorting={true}
+  cleanUserText={false}
   minCharactersToSearch=3
   maxItemsToShowInList=20
   labelFieldName="name"
   valueFieldName="name"
   placeholder="Search an MtG card name"
+  
   onChange={onChange}
 />
