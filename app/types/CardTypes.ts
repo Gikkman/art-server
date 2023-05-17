@@ -9,51 +9,7 @@ export type Card = {
   side?: "a" | "b" | undefined;
   uuid: string;
   otherFaceIds?: string;
-};
-
-export type ScryfallCard = {
-  name: string;
-  id: string;
-  illustration_id?: string;
-  image_uris?: {
-    normal: string;
-    large: string;
-    png: string;
-    art_crop: string;
-    border_crop: string;
-  };
-  card_faces?: CardFace[];
-  layout: string;
-};
-
-export type ScryfallImageUris = {
-  normal: string;
-  large: string;
-  png: string;
-  art_crop: string;
-  border_crop: string;
-};
-
-export type SingleFaceCard = {
-  name: string;
-  id: string;
-  layout: string;
-  illustration_id: string;
-  image_uris: ScryfallImageUris;
-};
-
-export type MultiFaceCard = {
-  name: string;
-  id: string;
-  layout: TwoFacedLayout;
-  image_uris?: ScryfallImageUris;
-  card_faces: [CardFace, CardFace];
-};
-
-export type CardFace = {
-  image_uris?: ScryfallImageUris;
-  name: string;
-  illustration_id?: string;
+  releaseDate: string;
 };
 
 export type CardImage = {
@@ -79,25 +35,10 @@ export function toArtState(s?: string): ArtState {
   return "UNAVAILABLE";
 }
 
-export const TWO_FACED_LAYOUT = [
-  "split",
-  "flip",
-  "transform",
-  "modal_dfc",
-  "meld",
-  "battle",
-  "double_faced_token",
-] as const;
-type TwoFacedLayout = (typeof TWO_FACED_LAYOUT)[number];
+export const FRONT_BACK_LAYOUT = ["transform", "modal_dfc", "double_faced_token"] as const;
+export const SPLIT_LAYOUT = ["aftermath", "split"] as const;
+export const DOUBLE_FRONT_LAYOUT = ["meld"] as const;
 
-export function isTwoFaced(card: ScryfallCard): card is MultiFaceCard {
-  return (
-    card.card_faces !== undefined &&
-    card.card_faces.length > 1 &&
-    TWO_FACED_LAYOUT.includes(card.layout as TwoFacedLayout)
-  );
-}
-
-export function isSingleFaced(card: ScryfallCard): card is SingleFaceCard {
-  return card.card_faces === undefined && !TWO_FACED_LAYOUT.includes(card.layout as TwoFacedLayout);
+export function isIn<T>(values: readonly T[], key: T) {
+  return values.includes(key);
 }

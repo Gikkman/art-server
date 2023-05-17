@@ -1,4 +1,4 @@
-import { Card, CardImage } from "./../../types/CardTypes";
+import { Card, CardImage, DOUBLE_FRONT_LAYOUT, FRONT_BACK_LAYOUT, SPLIT_LAYOUT, isIn } from "./../../types/CardTypes";
 import Database from "better-sqlite3";
 import path from "path";
 import { readdir } from "fs/promises";
@@ -32,12 +32,16 @@ SELECT
   layout,
   side,
   uuid,
-  otherFaceIds
+  otherFaceIds,
+  releaseDate
 FROM 
-  cards
+  cards c
+JOIN (SELECT code, releaseDate FROM sets) s ON c.setCode = s.code
 `;
 const GROUP_BY = `
 GROUP BY name, side, scryfallIllustrationId
+HAVING min(releaseDate)
+ORDER BY releaseDate
 `;
 
 export async function query(name: string): Promise<string[]> {
@@ -123,9 +127,11 @@ async function processCards(cards: Card[]) {
   type Copy = Card & { otherFace?: Card };
   const uuidMap: Map<string, Card> = new Map();
   const map: Map<string, Copy> = new Map();
+
   for (const card of cards) {
     uuidMap.set(card.uuid, card);
   }
+
   for (const card of cards) {
     const copy: Copy = { ...card };
     if (map.has(card.scryfallIllustrationId)) continue;
@@ -136,16 +142,19 @@ async function processCards(cards: Card[]) {
     }
     map.set(card.scryfallIllustrationId, copy);
   }
-  const ret: CardImage[] = [];
+
+  // Sometimes there are duplicate entries
+  const filterMap: Map<string, CardImage> = new Map();
+  const addToMap = (...c: CardImage[]) => c.forEach((e) => filterMap.set(e.illustrationId, e));
   for (const card of map.values()) {
-    if (card.otherFace && card.scryfallIllustrationId !== card.otherFace.scryfallIllustrationId) {
+    if (card.otherFace && isIn(FRONT_BACK_LAYOUT, card.layout)) {
       // Two faces, with different art (i.e. transform, mdfc)
       const front = card.side === "a" ? card : card.otherFace;
       const back = card.side === "b" ? card : card.otherFace;
       const faceA = toCardImage(front, true);
       const faceB = toCardImage(back, false);
-      ret.push(faceA, faceB);
-    } else if (card.otherFace && card.scryfallIllustrationId === card.otherFace.scryfallIllustrationId) {
+      addToMap(faceA, faceB);
+    } else if (card.otherFace && isIn(SPLIT_LAYOUT, card.layout)) {
       // Two faces, but with same art (i.e. split, flip, aftermath)
       // At least it is "one art" according to scryfall, but for our purpose we see them as two
       card.scryfallIllustrationId = card.scryfallIllustrationId + "-" + card.side;
@@ -154,18 +163,28 @@ async function processCards(cards: Card[]) {
       const faceB = toCardImage(card.otherFace, true);
       faceA.hasOtherFace = true;
       faceB.hasOtherFace = true;
-      ret.push(faceA, faceB);
+      addToMap(faceA, faceB);
+    } else if (card.otherFace && isIn(DOUBLE_FRONT_LAYOUT, card.layout)) {
+      // Two faces, but both are considered "front" faces (only for meld cards at the moment)
+      const front = card.side === "a" ? card : card.otherFace;
+      const back = card.side === "b" ? card : card.otherFace;
+      const faceA = toCardImage(front, true);
+      const faceB = toCardImage(back, true);
+      addToMap(faceA, faceB);
     } else {
       // Single face
       const face = toCardImage(card, true);
-      ret.push(face);
+      addToMap(face);
     }
   }
+
+  const ret: CardImage[] = [...filterMap.values()];
   const artAvailability = isArtAvailable(...ret.map((e) => e.illustrationId));
   for (const r of ret) {
     const artState = artAvailability.get(r.illustrationId);
     r.available = artState === "AVAILABLE";
   }
+
   console.log("Process time: " + (Date.now() - s));
   return ret;
 }

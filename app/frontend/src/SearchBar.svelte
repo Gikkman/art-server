@@ -10,11 +10,10 @@
   let previousChosenCard: {name:string} = {name:""};
 
   async function query(keyword: string) {
-    console.log(keyword)
     if(!keyword) return [];
+    keyword = keyword.toLowerCase();
 
-    // Local search cached results if the user just types more
-    // Note that "keyword" is cast to lower case by the AutoComplete component
+    // Search cached results if the user just types more
     if(previousQueryResult.length > 0 && keyword.startsWith(previousQueryKeyword)) {
       const newResult: {name:string}[] = [];
       for(let i = 0; i < previousQueryResult.length; i++) {
@@ -61,17 +60,18 @@
 
 </script>
 
-<!-- Search input field -->
 <AutoComplete
   searchFunction={query}
+
   delay="200"
   localSorting={true}
+  localFiltering={false}
   cleanUserText={false}
   minCharactersToSearch=3
   maxItemsToShowInList=20
   labelFieldName="name"
   valueFieldName="name"
   placeholder="Search an MtG card name"
-  
+
   onChange={onChange}
 />
