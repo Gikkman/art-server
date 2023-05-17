@@ -45,10 +45,11 @@ ORDER BY releaseDate
 `;
 
 export async function query(name: string): Promise<string[]> {
+  //Replace spaces with %. If there's several repeating spaces, they become just one %
+  const key = "%" + name.split(/\s+/).join("%") + "%";
   const db = await getDb();
-  db.exec(`PRAGMA case_sensitive_like=OFF`);
   const query = `SELECT name FROM cards WHERE name LIKE ? GROUP BY name`;
-  const rows = db.prepare(query).all(name + "%") as string[];
+  const rows = db.prepare(query).all(key) as string[];
   return rows;
 }
 

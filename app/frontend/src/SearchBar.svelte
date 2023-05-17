@@ -1,13 +1,15 @@
 <script lang="ts">
   import AutoComplete from "simple-svelte-autocomplete"
   import {type CardImage} from "../../types/CardTypes"
+  import { localQueryFilter, remoteQuery, type QueryResult } from "./search-api";
 
   // Communications channel
   export let cards: CardImage[];
-   
+  
+  
   let previousQueryKeyword: string = "";
-  let previousQueryResult: {name:string}[] = [];
-  let previousChosenCard: {name:string} = {name:""};
+  let previousQueryResult: QueryResult[] = [];
+  let previousChosenCard: QueryResult = {name:""};
 
   async function query(keyword: string) {
     if(!keyword) return [];
@@ -15,36 +17,16 @@
 
     // Search cached results if the user just types more
     if(previousQueryResult.length > 0 && keyword.startsWith(previousQueryKeyword)) {
-      const newResult: {name:string}[] = [];
-      for(let i = 0; i < previousQueryResult.length; i++) {
-        const word = previousQueryResult[i].name.toLowerCase();
-        if(word.startsWith(keyword)) {
-          newResult.push(previousQueryResult[i])
-        }
-      }
+      const newResult = localQueryFilter(keyword, previousQueryResult);
       previousQueryKeyword = keyword;
-      previousQueryResult = newResult;
+      previousQueryResult = newResult; 
       return newResult;
     }
 
-    // Fetch from the server if it is a new search
-    const controller = new AbortController();
-    setTimeout(() => {
-      controller.abort();
-    }, 5_000);
-    try {
-      const response = await fetch(`/query?name=${keyword}`, {signal: controller.signal})
-      if(response.status >= 200 && response.status < 300) {
-        const data = await response.json();
-        previousQueryResult = data.names;
-        previousQueryKeyword = keyword;
-        return data.names;
-      }
-    } catch (ex) {
-      console.error(ex)
-    }
-
-    return [];
+    const newResult = await remoteQuery(keyword);
+    previousQueryResult = newResult;
+    previousQueryKeyword = keyword;
+    return newResult;
   }
 
   async function onChange(item: {name: string}) {
@@ -68,7 +50,7 @@
   localFiltering={false}
   cleanUserText={false}
   minCharactersToSearch=3
-  maxItemsToShowInList=20
+  maxItemsToShowInList=14
   labelFieldName="name"
   valueFieldName="name"
   placeholder="Search an MtG card name"
