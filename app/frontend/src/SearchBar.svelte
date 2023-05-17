@@ -45,7 +45,7 @@
 <AutoComplete
   searchFunction={query}
 
-  delay="200"
+  delay="250"
   localSorting={true}
   localFiltering={false}
   cleanUserText={false}

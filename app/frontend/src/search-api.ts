@@ -3,6 +3,17 @@ export type QueryResult = { name: string };
 export function localQueryFilter(keyword: string, alternatives: QueryResult[]) {
   const keywords = keyword.split(/\s+/);
   const newResult: QueryResult[] = [];
+
+  /* This code is pretty messy, but in short, we search through the alternatives
+   * and try to match our keyword(s) in order toward an alternative.
+   *
+   * Take "bo li" as the keyword. We split the keyword on space, and then search
+   * alternatives for a word that has each keyword in-order. So "BOlas sLInger"
+   * would match, because each keyword is found, and in order. But "LImited BOmbs"
+   * would not, since they are out of order. Neither "aBOLIsh" would match, because
+   * the two keywords needs to be at least 1 character apart. So "aBOsLIve" would
+   * match.
+   */
   for (let i = 0; i < alternatives.length; i++) {
     const word = alternatives[i].name.toLowerCase();
     const target = keywords.length;
