@@ -133,9 +133,9 @@ export function isCardImage(obj: unknown): obj is CardImage {
         (typeof typedObj["available"] === "undefined" ||
             typedObj["available"] === false ||
             typedObj["available"] === true) &&
-        (typeof typedObj["hasOtherFace"] === "undefined" ||
-            typedObj["hasOtherFace"] === false ||
-            typedObj["hasOtherFace"] === true)
+        (typeof typedObj["hasSyntheticFace"] === "undefined" ||
+            typedObj["hasSyntheticFace"] === false ||
+            typedObj["hasSyntheticFace"] === true)
     )
 }
 

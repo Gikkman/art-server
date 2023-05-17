@@ -12,12 +12,13 @@ export type Card = {
   releaseDate: string;
 };
 
+// A synthetic face is where Scryfall says it is 1 card art, but it is actually 2 (i.e. split cards)
 export type CardImage = {
   name: string;
   illustrationId: string;
   imageUrl: string;
   available?: boolean;
-  hasOtherFace?: boolean;
+  hasSyntheticFace?: boolean;
 };
 
 export const ART_STATE = ["UNAVAILABLE", "PENDING", "AVAILABLE"] as const;

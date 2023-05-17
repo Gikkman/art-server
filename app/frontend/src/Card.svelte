@@ -28,7 +28,7 @@
   />
   <img class="placeholder" src="/placeholder.jpg" alt="Is Loading" />
 
-  {#if card.hasOtherFace}
+  {#if card.hasSyntheticFace}
     <p in:fade out:fade class="name">{card.name}</p>
   {/if}
 </div>

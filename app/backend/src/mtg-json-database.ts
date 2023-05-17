@@ -161,8 +161,8 @@ async function processCards(cards: Card[]) {
       card.otherFace.scryfallIllustrationId = card.otherFace.scryfallIllustrationId + "-" + card.otherFace.side;
       const faceA = toCardImage(card, true);
       const faceB = toCardImage(card.otherFace, true);
-      faceA.hasOtherFace = true;
-      faceB.hasOtherFace = true;
+      faceA.hasSyntheticFace = true;
+      faceB.hasSyntheticFace = true;
       addToMap(faceA, faceB);
     } else if (card.otherFace && isIn(DOUBLE_FRONT_LAYOUT, card.layout)) {
       // Two faces, but both are considered "front" faces (only for meld cards at the moment)
