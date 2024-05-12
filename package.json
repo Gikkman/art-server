@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "prebuild": "npx ts-json-schema-generator --path 'app/types/ProgramConfig.ts' --type 'ProgramConfig' --out './config.schema.json' --tsconfig './tsconfig.json'",
-    "build": "concurrently \"npm:build-types\" \"npm:build-backend\" \"npm:build-frontend\"",
+    "build": "npm run --workspaces --if-present build",
     "build-types": "npm run --prefix ./app/types build",
     "build-backend": "npm run --prefix ./app/backend build",
     "build-frontend": "npm run --prefix ./app/frontend build",
@@ -38,5 +38,8 @@
     "eslint-plugin-prettier": "^4.2.1",
     "prettier": "^2.8.8",
     "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "tsx": "^4.10.1"
   }
 }

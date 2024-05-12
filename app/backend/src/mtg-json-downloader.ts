@@ -64,14 +64,17 @@ export async function runDownload() {
 
   await fetchFile(downloadDir)
     .then(async (file) => {
+      console.log("Hash matching MtgJSON zip")
       const localFileHash = await hashFile(file);
       const remoteHash = await getHashFromServer();
       if (localFileHash !== remoteHash) {
         throw `Error: Hash mismatch! Remote: ${remoteHash} Local: ${localFileHash}`;
       }
+      console.log("Hash matched")
       return file;
     })
     .then(async (file) => {
+      console.log("Unpacking MtgJSON zip")
       const unzippedFileName = "AllPrintings-" + Math.floor(new Date().getTime() / 1000) + ".sqlite";
       await unzip(file, dataDir, unzippedFileName);
       await unlink(file);

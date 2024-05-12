@@ -36,6 +36,7 @@ SELECT
   releaseDate
 FROM 
   cards c
+JOIN (SELECT scryfallId, scryfallIllustrationId, uuid as id FROM cardIdentifiers) ci ON c.uuid = ci.id
 JOIN (SELECT code, releaseDate FROM sets) s ON c.setCode = s.code
 `;
 const GROUP_BY = `
