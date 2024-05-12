@@ -1,17 +1,24 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-      {
-        "type": "node",
-        "request": "launch",
-        "name": "Launch Program",
-        "cwd": "${workspaceFolder}/app/backend",
-        "program": "${workspaceFolder}/app/backend/_dist/backend/src/index.js",
-        "preLaunchTask": "npm: build",
-        "outFiles": ["${workspaceFolder}/app/backend/_dist/backend/src/**/*.js"]
-      }
-    ]
-  }
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Program",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/tsx",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "cwd": "${workspaceFolder}/app/backend",
+      "program": "${workspaceFolder}/app/backend/src/index.ts",
+
+      // Files to exclude from debugger (e.g. call stack)
+      "skipFiles": [
+        "<node_internals>/**",
+        "${workspaceFolder}/node_modules/**",
+      ],
+    }
+  ]
+}

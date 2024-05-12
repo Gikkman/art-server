@@ -1,11 +1,11 @@
-import { PathLike, createWriteStream, mkdirSync, readdirSync } from "fs";
+import { PathLike, createReadStream, createWriteStream, mkdirSync, readdirSync } from "fs";
 import { readFile, rmdir, unlink, rm } from "fs/promises";
 import { join } from "path";
 import { createHash } from "crypto";
 import { promisify } from "util";
 import axios from "axios";
 import stream from "stream";
-import decompress from "decompress";
+import unzipper from "unzipper";
 import Database from "better-sqlite3";
 import { mtgJsonDir } from "./mtg-json-database";
 import { sleep } from "./util";
@@ -16,12 +16,14 @@ const fileAddress = "https://mtgjson.com/api/v5/AllPrintings.sqlite.zip";
 const fileHashAddress = "https://mtgjson.com/api/v5/AllPrintings.sqlite.zip.sha256";
 
 async function unzip(input: string, outputDir: string, outputFile: string): Promise<void> {
-  await decompress(input, outputDir, {
-    map: (file) => {
-      file.path = outputFile;
-      return file;
-    },
-  });
+  try {
+    const zip = createReadStream(input).pipe(unzipper.Parse({forceStream: true}));
+    for await (const entry of zip) {
+      entry.pipe(createWriteStream(join(outputDir, outputFile)));
+    }
+  } catch (error) {
+    console.error(error)
+  }
 }
 
 async function fetchFile(downloadDir: string) {
