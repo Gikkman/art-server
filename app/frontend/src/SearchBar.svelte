@@ -54,8 +54,6 @@
   valueFieldName="name"
   placeholder="Search an MtG card name"
 
-  dropdownClassName=dropdown
-
   onChange={onChange}
 />
 
