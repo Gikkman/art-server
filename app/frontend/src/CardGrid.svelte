@@ -1,7 +1,7 @@
 <script lang="ts">
   import {type CardImage} from "../../types/CardTypes"
   import Card from "./Card.svelte"
-  
+
   export let cards: CardImage[];
 </script>
 
@@ -16,7 +16,7 @@
   .card-grid {
     padding-top: 25px;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 1rem;
   }
   .sneaky-preload {
