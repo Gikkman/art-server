@@ -59,8 +59,3 @@
   onChange={onChange}
 />
 
-<style>
-  .dropdown {
-    top: 0px !important;
-  }
-</style>
