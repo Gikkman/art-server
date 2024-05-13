@@ -5,8 +5,8 @@
 
   // Communications channel
   export let cards: CardImage[];
-  
-  
+
+
   let previousQueryKeyword: string = "";
   let previousQueryResult: QueryResult[] = [];
   let previousChosenCard: QueryResult = {name:""};
@@ -19,7 +19,7 @@
     if(previousQueryResult.length > 0 && keyword.startsWith(previousQueryKeyword)) {
       const newResult = localQueryFilter(keyword, previousQueryResult);
       previousQueryKeyword = keyword;
-      previousQueryResult = newResult; 
+      previousQueryResult = newResult;
       return newResult;
     }
 
@@ -49,10 +49,18 @@
 
   minCharactersToSearch=3
   maxItemsToShowInList=14
-  
+
   labelFieldName="name"
   valueFieldName="name"
   placeholder="Search an MtG card name"
-  
+
+  dropdownClassName=dropdown
+
   onChange={onChange}
 />
+
+<style>
+  .dropdown {
+    top: 0px !important;
+  }
+</style>
